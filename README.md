@@ -1,49 +1,584 @@
 # AI Prompt Generator
 
-Интерактивный Bash-скрипт для создания структурированных запросов к ИИ по методологиям **RCT** или **COSTAR**.
+[English](#english) | [Русский](#russian)
 
-Скрипт пошагово спрашивает поля промпта, показывает готовый текст в терминале и позволяет:
+<a id="english"></a>
+## English
 
-- скопировать промпт в буфер обмена;
-- сохранить промпт в файл `Markdown`;
-- сохранить структурированные данные в файл `JSON`.
+### Overview
+
+**AI Prompt Generator** is an interactive Bash script for creating structured prompts for AI chats.
+
+The script asks a series of questions and builds a final prompt using one of two prompt-engineering frameworks:
+
+- **RCT** — Role, Context, Task;
+- **COSTAR** — Context, Objective, Style, Tone, Audience, Response.
+
+After the questionnaire is completed, the script displays the final prompt and allows you to:
+
+- copy it to the clipboard;
+- save it as a `Markdown` file;
+- save it as a structured `JSON` file.
 
 ---
 
-## Возможности
+### Features
 
-- Выбор шаблона промпта в начале работы:
-  - `RCT` — Role, Context, Task;
-  - `COSTAR` — Context, Objective, Style, Tone, Audience, Response.
-- Подсказки с примерами для каждого поля.
-- Автоматические значения по умолчанию, если поле оставлено пустым.
-- Финальный промпт в читаемом Markdown-формате.
-- Интерактивное меню после заполнения:
-  1. копировать в буфер обмена;
-  2. сохранить как `JSON`;
-  3. сохранить как `Markdown`;
-  4. выйти.
-- Поддержка буфера обмена в разных окружениях:
+- Interactive prompt construction.
+- Choice between `RCT` and `COSTAR` frameworks.
+- Example hints for every input field.
+- Default values for empty inputs.
+- Final prompt generated in readable Markdown format.
+- Copy final prompt to clipboard.
+- Save result as `JSON`.
+- Save result as `Markdown`.
+- Works in terminal environments:
+  - Linux;
   - macOS;
-  - Linux/X11;
-  - Wayland;
   - WSL;
   - Termux.
-- Базовое экранирование служебных символов при сохранении `JSON`.
+- Optional clipboard support through common system utilities.
 
 ---
 
-## Требования
+### Requirements
 
-Для работы скрипта необходим:
+Required:
 
-- `bash` версии 4 или выше;
+- `bash`, preferably version 4 or newer;
+- standard shell utilities:
+  - `cat`;
+  - `printf`;
+  - `read`.
+
+Optional clipboard utilities:
+
+| Environment | Utility |
+|---|---|
+| macOS | `pbcopy` |
+| Wayland | `wl-copy` |
+| X11 | `xclip` or `xsel` |
+| Termux | `termux-clipboard-set` |
+| WSL / Windows | `clip.exe` |
+
+If no clipboard utility is found, the script will still work, but clipboard copying will be unavailable.
+
+---
+
+### Installation
+
+Create a script file:
+
+```bash
+nano ai_prompt.sh
+```
+
+Paste the script content, save the file, and make it executable:
+
+```bash
+chmod +x ai_prompt.sh
+```
+
+Run it:
+
+```bash
+./ai_prompt.sh
+```
+
+Or run it through Bash explicitly:
+
+```bash
+bash ai_prompt.sh
+```
+
+---
+
+### Usage
+
+After starting, the script asks which framework to use:
+
+```text
+=== Генератор структурированных промптов для ИИ ===
+Выберите методологию:
+1) RCT (Role, Context, Task)
+2) COSTAR (Context, Objective, Style, Tone, Audience, Response)
+Введите номер (1 или 2):
+```
+
+Then it asks for the fields required by the selected framework.
+
+---
+
+### RCT Template
+
+`RCT` is suitable for simple and direct AI requests.
+
+| Field | Purpose | Example |
+|---|---|---|
+| `ROLE` | The role the AI should assume | `Senior Python Developer, Django 5 expert` |
+| `CONTEXT` | Project context, stack, constraints | `Developing a REST API for a blog using Django REST Framework` |
+| `TASK` | The exact task for the AI | `Write a custom manager that filters only published posts` |
+
+Example final prompt:
+
+```markdown
+# ROLE
+Senior Python Developer, Django 5 expert
+
+# CONTEXT
+Developing a REST API for a blog using Django REST Framework
+
+# TASK
+Write a custom manager that filters only published posts
+```
+
+---
+
+### COSTAR Template
+
+`COSTAR` is suitable for more detailed and controlled AI requests.
+
+| Field | Purpose | Example |
+|---|---|---|
+| `CONTEXT` | Background information | `Django project with slow SQL queries in product listing` |
+| `OBJECTIVE` | Desired goal | `Optimize queries using select_related and prefetch_related` |
+| `STYLE` | Required style | `PEP8-compatible code with type hints` |
+| `TONE` | Response tone | `Professional and technical` |
+| `AUDIENCE` | Target audience | `Middle Python developer` |
+| `RESPONSE` | Required response format | `Return only code without explanations` |
+
+Example final prompt:
+
+```markdown
+# CONTEXT
+Django project with slow SQL queries in product listing
+
+# OBJECTIVE
+Optimize queries using select_related and prefetch_related
+
+# STYLE
+PEP8-compatible code with type hints
+
+# TONE
+Professional and technical
+
+# AUDIENCE
+Middle Python developer
+
+# RESPONSE FORMAT
+Return only code without explanations
+```
+
+---
+
+### Actions After Questionnaire
+
+After displaying the final prompt, the script shows a menu:
+
+```text
+Действие:
+1) Скопировать в буфер обмена
+2) Сохранить в JSON
+3) Сохранить в Markdown
+4) Выйти
+Выберите действие [1-4]:
+```
+
+You can perform multiple actions before exiting.
+
+---
+
+### Clipboard Support
+
+The script tries to copy the final prompt using one of the following utilities:
+
+```text
+pbcopy
+wl-copy
+xclip
+xsel
+termux-clipboard-set
+clip.exe
+```
+
+If copying succeeds, you will see:
+
+```text
+Промпт скопирован в буфер обмена.
+```
+
+If no clipboard utility is available:
+
+```text
+Не найдена утилита буфера обмена.
+Поддерживаются: pbcopy, wl-copy, xclip, xsel, termux-clipboard-set, clip.exe.
+```
+
+On Linux X11, you can install:
+
+```bash
+sudo apt install xclip
+```
+
+or:
+
+```bash
+sudo apt install xsel
+```
+
+On Wayland:
+
+```bash
+sudo apt install wl-clipboard
+```
+
+---
+
+### Saving as Markdown
+
+Select menu item `3`.
+
+Default file name:
+
+```text
+prompt.md
+```
+
+Example prompt:
+
+```text
+Имя файла [prompt.md]:
+```
+
+Press `Enter` to accept the default file name.
+
+The Markdown file will contain the final generated prompt.
+
+Example:
+
+```markdown
+# ROLE
+Senior Python Developer, Django 5 expert
+
+# CONTEXT
+Developing a REST API for a blog using Django REST Framework
+
+# TASK
+Write a custom manager that filters only published posts
+```
+
+---
+
+### Saving as JSON
+
+Select menu item `2`.
+
+Default file name:
+
+```text
+prompt.json
+```
+
+Example prompt:
+
+```text
+Имя файла [prompt.json]:
+```
+
+Press `Enter` to accept the default file name.
+
+The JSON file contains structured prompt data.
+
+---
+
+### JSON Example for RCT
+
+```json
+{
+  "framework": "RCT",
+  "role": "Senior Python Developer, Django 5 expert",
+  "context": "Developing a REST API for a blog using Django REST Framework",
+  "task": "Write a custom manager that filters only published posts",
+  "prompt": "# ROLE\nSenior Python Developer, Django 5 expert\n\n# CONTEXT\nDeveloping a REST API for a blog using Django REST Framework\n\n# TASK\nWrite a custom manager that filters only published posts"
+}
+```
+
+---
+
+### JSON Example for COSTAR
+
+```json
+{
+  "framework": "COSTAR",
+  "context": "Django project with slow SQL queries in product listing",
+  "objective": "Optimize queries using select_related and prefetch_related",
+  "style": "PEP8-compatible code with type hints",
+  "tone": "Professional and technical",
+  "audience": "Middle Python developer",
+  "response": "Return only code without explanations",
+  "prompt": "# CONTEXT\nDjango project with slow SQL queries in product listing\n\n# OBJECTIVE\nOptimize queries using select_related and prefetch_related\n\n# STYLE\nPEP8-compatible code with type hints\n\n# TONE\nProfessional and technical\n\n# AUDIENCE\nMiddle Python developer\n\n# RESPONSE FORMAT\nReturn only code without explanations"
+}
+```
+
+---
+
+### Default Values
+
+If a field is left empty, the script uses a default value.
+
+Default values for `RCT`:
+
+```text
+ROLE:
+Senior Python Developer, Django 5 expert
+
+CONTEXT:
+Django 5 project, REST API
+
+TASK:
+Write code to solve the task
+```
+
+Default values for `COSTAR`:
+
+```text
+CONTEXT:
+Django 5 project, REST API
+
+OBJECTIVE:
+Solve the task and produce working code
+
+STYLE:
+PEP8, type hints, code comments
+
+TONE:
+Professional and technical
+
+AUDIENCE:
+Middle Python developer
+
+RESPONSE:
+Only code without explanations
+```
+
+---
+
+### Existing File Behavior
+
+If the target file already exists, the script asks:
+
+```text
+Файл 'prompt.md' уже существует. Перезаписать? (y/N):
+```
+
+Possible answers:
+
+- `y` or `Y` — overwrite the file;
+- any other input — cancel saving.
+
+---
+
+### Project Structure
+
+Minimal project structure:
+
+```text
+.
+├── README.md
+└── ai_prompt.sh
+```
+
+After saving generated files, the directory may look like this:
+
+```text
+.
+├── README.md
+├── ai_prompt.sh
+├── prompt.json
+└── prompt.md
+```
+
+---
+
+### Customization
+
+You can edit default values inside the script.
+
+For `RCT`, find this block:
+
+```bash
+rct_role="${rct_role:-Senior Python Developer, эксперт в Django 5}"
+rct_context="${rct_context:-Проект на Django 5, REST API}"
+rct_task="${rct_task:-Напиши код для решения задачи}"
+```
+
+For `COSTAR`, find this block:
+
+```bash
+costar_c="${costar_c:-Проект на Django 5, REST API}"
+costar_o="${costar_o:-Решить задачу и получить рабочий код}"
+costar_s="${costar_s:-PEP8, type hints, комментарии в коде}"
+costar_t="${costar_t:-Профессиональный, технический}"
+costar_a="${costar_a:-Разработчик уровня Middle Python}"
+costar_r="${costar_r:-Только код без пояснений}"
+```
+
+You can also change default output file names here:
+
+```bash
+save_file "$JSON_CONTENT" "prompt.json"
+save_file "$FINAL_PROMPT" "prompt.md"
+```
+
+---
+
+### Troubleshooting
+
+#### Permission denied
+
+If you get:
+
+```text
+Permission denied
+```
+
+make the script executable:
+
+```bash
+chmod +x ai_prompt.sh
+```
+
+---
+
+#### Clipboard does not work
+
+If you see:
+
+```text
+Не найдена утилита буфера обмена.
+```
+
+install one of the supported clipboard utilities.
+
+For X11:
+
+```bash
+sudo apt install xclip
+```
+
+For Wayland:
+
+```bash
+sudo apt install wl-clipboard
+```
+
+On macOS, `pbcopy` is usually already installed.
+
+---
+
+#### File cannot be saved
+
+Check:
+
+- directory exists;
+- you have write permission;
+- file path is correct.
+
+Use:
+
+```bash
+ls -l
+```
+
+to inspect permissions.
+
+---
+
+### Limitations
+
+- Each field is entered as a single line.
+- Multiline input is not supported by default.
+- Clipboard copying requires an external utility.
+- JSON escaping covers common cases such as quotes, newlines, tabs, and some control characters.
+
+---
+
+### Recommendations
+
+For better AI results:
+
+- describe the task clearly;
+- specify language, framework, and library versions;
+- define the expected output format;
+- ask for code only if explanations are not needed;
+- mention the target audience if explanation depth matters.
+
+Example of a good task:
+
+```text
+Write a Django model, serializer, and viewset for an Article entity.
+Use Django 5 and Django REST Framework.
+Return only code without explanations.
+```
+
+---
+
+### License
+
+This script is provided as-is. Use and modify it as needed. Add your own license file if required.
+
+---
+
+<a id="russian"></a>
+## Русский
+
+### Описание
+
+**AI Prompt Generator** — это интерактивный Bash-скрипт для создания структурированных запросов к ИИ.
+
+Скрипт задаёт пользователю последовательные вопросы и формирует итоговый промпт по одной из двух методологий:
+
+- **RCT** — Role, Context, Task;
+- **COSTAR** — Context, Objective, Style, Tone, Audience, Response.
+
+После завершения опроса скрипт показывает готовый промпт и позволяет:
+
+- скопировать его в буфер обмена;
+- сохранить в файл `Markdown`;
+- сохранить в структурированный файл `JSON`.
+
+---
+
+### Возможности
+
+- Интерактивное заполнение промпта.
+- Выбор между `RCT` и `COSTAR`.
+- Подсказки с примерами для каждого поля.
+- Значения по умолчанию для пустых полей.
+- Итоговый промпт в читаемом Markdown-формате.
+- Копирование результата в буфер обмена.
+- Сохранение результата в `JSON`.
+- Сохранение результата в `Markdown`.
+- Работа в терминальных окружениях:
+  - Linux;
+  - macOS;
+  - WSL;
+  - Termux.
+- Опциональная поддержка буфера обмена через системные утилиты.
+
+---
+
+### Требования
+
+Обязательные зависимости:
+
+- `bash`, желательно версии 4 или новее;
 - стандартные утилиты командной строки:
   - `cat`;
   - `printf`;
   - `read`.
 
-Дополнительные зависимости нужны только для копирования в буфер обмена:
+Дополнительные утилиты для буфера обмена:
 
 | Платформа / окружение | Утилита |
 |---|---|
@@ -53,13 +588,13 @@
 | Termux | `termux-clipboard-set` |
 | WSL / Windows | `clip.exe` |
 
-Если ни одна утилита не найдена, скрипт сообщит об ошибке, но сохранение в файл продолжит работать.
+Если ни одна утилита не найдена, скрипт продолжит работу, но копирование в буфер обмена будет недоступно.
 
 ---
 
-## Установка
+### Установка
 
-Создайте файл скрипта, например:
+Создайте файл скрипта:
 
 ```bash
 nano ai_prompt.sh
@@ -77,7 +612,7 @@ chmod +x ai_prompt.sh
 ./ai_prompt.sh
 ```
 
-Или через `bash`:
+Или через явный вызов `bash`:
 
 ```bash
 bash ai_prompt.sh
@@ -85,7 +620,7 @@ bash ai_prompt.sh
 
 ---
 
-## Использование
+### Использование
 
 После запуска скрипт предложит выбрать методологию:
 
@@ -101,16 +636,14 @@ bash ai_prompt.sh
 
 ---
 
-## Шаблон RCT
+### Шаблон RCT
 
-`RCT` подходит для простых и понятных запросов.
-
-Поля:
+`RCT` подходит для простых и прямых запросов.
 
 | Поле | Назначение | Пример |
 |---|---|---|
 | `ROLE` | Роль, которую должен принять ИИ | `Senior Python Developer, эксперт в Django 5` |
-| `CONTEXT` | Контекст задачи, проект, технологии | `Разрабатываемое приложение: REST API для блога на DRF` |
+| `CONTEXT` | Контекст проекта, стек, ограничения | `Разрабатываемое приложение: REST API для блога на DRF` |
 | `TASK` | Конкретная задача для ИИ | `Напиши кастомный менеджер для фильтрации только опубликованных постов` |
 
 Пример итогового промпта:
@@ -128,11 +661,9 @@ Senior Python Developer, эксперт в Django 5
 
 ---
 
-## Шаблон COSTAR
+### Шаблон COSTAR
 
 `COSTAR` подходит для более детализированных запросов, где важны стиль, тон, аудитория и формат ответа.
-
-Поля:
 
 | Поле | Назначение | Пример |
 |---|---|---|
@@ -167,7 +698,7 @@ Senior Python Developer, эксперт в Django 5
 
 ---
 
-## Действия после заполнения
+### Действия после заполнения
 
 После вывода готового промпта скрипт покажет меню:
 
@@ -180,15 +711,13 @@ Senior Python Developer, эксперт в Django 5
 Выберите действие [1-4]:
 ```
 
-Можно выполнять действия несколько раз подряд, пока вы не выберете выход.
+Можно выполнять несколько действий подряд, пока вы не выберете выход.
 
 ---
 
-## Копирование в буфер обмена
+### Поддержка буфера обмена
 
-При выборе пункта `1` скрипт попытается скопировать готовый промпт в буфер обмена.
-
-Поддерживаются следующие команды:
+Скрипт пытается скопировать промпт с помощью одной из следующих утилит:
 
 ```text
 pbcopy
@@ -212,9 +741,7 @@ clip.exe
 Поддерживаются: pbcopy, wl-copy, xclip, xsel, termux-clipboard-set, clip.exe.
 ```
 
-### Установка утилит для Linux
-
-Для X11:
+Для X11 можно установить:
 
 ```bash
 sudo apt install xclip
@@ -234,11 +761,11 @@ sudo apt install wl-clipboard
 
 ---
 
-## Сохранение в Markdown
+### Сохранение в Markdown
 
-При выборе пункта `3` скрипт предложит имя файла.
+Выберите пункт меню `3`.
 
-По умолчанию:
+Имя файла по умолчанию:
 
 ```text
 prompt.md
@@ -252,9 +779,9 @@ prompt.md
 
 Если просто нажать `Enter`, будет использовано имя по умолчанию.
 
-Файл будет содержать готовый промпт в Markdown-формате.
+Файл будет содержать итоговый промпт в Markdown-формате.
 
-Пример содержимого `prompt.md`:
+Пример:
 
 ```markdown
 # ROLE
@@ -269,11 +796,11 @@ Senior Python Developer, эксперт в Django 5
 
 ---
 
-## Сохранение в JSON
+### Сохранение в JSON
 
-При выборе пункта `2` скрипт предложит имя файла.
+Выберите пункт меню `2`.
 
-По умолчанию:
+Имя файла по умолчанию:
 
 ```text
 prompt.json
@@ -287,11 +814,11 @@ prompt.json
 
 Если просто нажать `Enter`, будет использовано имя по умолчанию.
 
-Файл будет содержать структурированные данные выбранного промпта.
+Файл будет содержать структурированные данные промпта.
 
 ---
 
-## Пример JSON для RCT
+### Пример JSON для RCT
 
 ```json
 {
@@ -305,7 +832,7 @@ prompt.json
 
 ---
 
-## Пример JSON для COSTAR
+### Пример JSON для COSTAR
 
 ```json
 {
@@ -322,9 +849,9 @@ prompt.json
 
 ---
 
-## Значения по умолчанию
+### Значения по умолчанию
 
-Если оставить поле пустым и нажать `Enter`, скрипт подставит значение по умолчанию.
+Если оставить поле пустым, скрипт подставит значение по умолчанию.
 
 Для `RCT`:
 
@@ -363,7 +890,7 @@ RESPONSE:
 
 ---
 
-## Поведение при существующем файле
+### Поведение при существующем файле
 
 Если указанный файл уже существует, скрипт спросит:
 
@@ -378,9 +905,9 @@ RESPONSE:
 
 ---
 
-## Структура проекта
+### Структура проекта
 
-Минимальная структура может выглядеть так:
+Минимальная структура проекта:
 
 ```text
 .
@@ -388,7 +915,7 @@ RESPONSE:
 └── ai_prompt.sh
 ```
 
-После сохранения файлов могут появиться:
+После сохранения сгенерированных файлов каталог может выглядеть так:
 
 ```text
 .
@@ -400,7 +927,7 @@ RESPONSE:
 
 ---
 
-## Настройка
+### Настройка
 
 Вы можете изменить значения по умолчанию прямо в скрипте.
 
@@ -425,7 +952,7 @@ costar_a="${costar_a:-Разработчик уровня Middle Python}"
 costar_r="${costar_r:-Только код без пояснений}"
 ```
 
-Также можно изменить имена файлов по умолчанию в блоке меню:
+Также можно изменить имена файлов по умолчанию здесь:
 
 ```bash
 save_file "$JSON_CONTENT" "prompt.json"
@@ -434,11 +961,11 @@ save_file "$FINAL_PROMPT" "prompt.md"
 
 ---
 
-## Типичные проблемы
+### Типичные проблемы
 
-### `Permission denied` при запуске
+#### `Permission denied` при запуске
 
-Если вы видите ошибку вида:
+Если появляется ошибка:
 
 ```text
 Permission denied
@@ -452,19 +979,7 @@ chmod +x ai_prompt.sh
 
 ---
 
-### `command not found: bash`
-
-Убедитесь, что в системе установлен `bash`.
-
-Проверка:
-
-```bash
-bash --version
-```
-
----
-
-### Не работает копирование в буфер обмена
+#### Не работает копирование в буфер обмена
 
 Если появляется сообщение:
 
@@ -488,23 +1003,17 @@ sudo apt install wl-clipboard
 
 В macOS `pbcopy` обычно уже установлен.
 
-В Termux:
-
-```bash
-pkg install termux-api
-```
-
 ---
 
-### Файл не сохраняется
+#### Файл не сохраняется
 
 Проверьте:
 
 - существует ли каталог;
 - есть ли права на запись;
-- корректность имени файла.
+- корректность пути к файлу.
 
-Пример проверки прав:
+Для проверки прав используйте:
 
 ```bash
 ls -l
@@ -512,7 +1021,7 @@ ls -l
 
 ---
 
-## Ограничения
+### Ограничения
 
 - Каждое поле вводится одной строкой.
 - Многострочный ввод в текущей версии не поддерживается.
@@ -521,15 +1030,15 @@ ls -l
 
 ---
 
-## Рекомендации
+### Рекомендации
 
-Для лучшей интеграции с ИИ рекомендуется:
+Для получения лучших результатов от ИИ:
 
-- писать конкретные задачи;
-- указывать версию языка, фреймворка или библиотеки;
-- явно задавать формат ответа;
-- просить только код, если не нужны пояснения;
-- указывать целевую аудиторию, если важен уровень объяснений.
+- формулируйте задачу максимально конкретно;
+- указывайте версию языка, фреймворка или библиотеки;
+- явно задавайте формат ответа;
+- просите только код, если пояснения не нужны;
+- указывайте целевую аудиторию, если важна глубина объяснений.
 
 Пример хорошей задачи:
 
@@ -541,6 +1050,6 @@ ls -l
 
 ---
 
-## Лицензия
+### Лицензия
 
-MIT.
+Скрипт предоставляется как есть. Используйте и изменяйте его по своему усмотрению. При необходимости добавьте собственную лицензию в проект.
