@@ -10,8 +10,6 @@ copy_to_clipboard() {
 
     if command -v pbcopy >/dev/null 2>&1; then
         printf '%s' "$text" | pbcopy
-    elif command -v wl-copy >/dev/null 2>&1; then
-        printf '%s' "$text" | wl-copy
     elif command -v xclip >/dev/null 2>&1; then
         printf '%s' "$text" | xclip -selection clipboard
     elif command -v xsel >/dev/null 2>&1; then
@@ -20,6 +18,8 @@ copy_to_clipboard() {
         printf '%s' "$text" | termux-clipboard-set
     elif command -v clip.exe >/dev/null 2>&1; then
         printf '%s' "$text" | clip.exe
+    elif command -v wl-copy >/dev/null 2>&1; then
+        printf '%s' "$text" | wl-copy
     else
         return 1
     fi
